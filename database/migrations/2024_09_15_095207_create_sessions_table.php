@@ -16,8 +16,7 @@ class CreateSessionsTable extends Migration
             $table->text('details'); // Details of the session
             $table->string('repetition_status')->default('pending'); // Status of repetition
             $table->integer('repetition_period')->nullable(); // Period for repetition
-            $table->string('session_status')->default('pending'); // Status of the session
-            $table->uuid('payment_id'); // Foreign key to payments table
+            $table->string('session_status')->default('pending'); // Status of the session// Foreign key to paymentable
             $table->uuid('administrator'); // Foreign key to users table
             $table->uuid('student_id'); // Foreign key to users table
             $table->timestamps(); // Timestamps for created_at and updated_at
@@ -25,7 +24,6 @@ class CreateSessionsTable extends Migration
              // Foreign key constraints
              $table->foreign('administrator')->references('id')->on('users')->onDelete('cascade');
              $table->foreign('student_id')->references('id')->on('users')->onDelete('cascade');
-             $table->foreign('payment_id')->references('id')->on('payments')->onDelete('cascade');
         });
     }
 
