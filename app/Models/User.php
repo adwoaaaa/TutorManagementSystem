@@ -8,9 +8,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Tymon\JWTAuth\Contracts\Providers\JWT;
 
-
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -59,5 +60,25 @@ class User extends Authenticatable
 
     public $incrementing = false;
     protected $keyType = 'string';
+
+   /**
+     * Get the identifier that will be stored in the JWT payload.
+     *
+     * @return mixed
+     */
+   public function getJWTIdentifier()
+   {
+       return $this->getKey();
+   }
+
+   /**
+    * Get the custom claims array to be added to the JWT payload.
+    *
+    * @return array
+    */
+   public function getJWTCustomClaims()
+   {
+       return [];
+   }
 
 }
