@@ -22,7 +22,7 @@ return new class extends Migration
 
             // Foreign key constraints
             $table->foreign('student_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('session_request_form_id')->references('sessionID')->on('session_request_forms')->onDelete('cascade');
+            $table->foreign('session_request_form_id')->references('session_id')->on('session_request_forms')->onDelete('cascade');
         });
     }
 

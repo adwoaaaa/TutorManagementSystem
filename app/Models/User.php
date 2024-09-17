@@ -10,6 +10,8 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Tymon\JWTAuth\Contracts\Providers\JWT;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -80,5 +82,24 @@ class User extends Authenticatable implements JWTSubject
    {
        return [];
    }
+
+   // Relationships with other models
+
+   public function sessionRequests()
+   {
+       return $this->hasMany(SessionRequestForm::class, 'student');
+   }
+
+
+   public function sessions()
+   {
+       return $this->hasMany(Session::class, 'student_id');
+   }
+
+
+   public function payments()
+    {
+        return $this->hasMany(Payment::class, 'student');
+    }
 
 }

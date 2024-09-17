@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('session_request_forms', function (Blueprint $table) {
             $table->id();  // Use an auto-incrementing primary key
-            $table->uuid('sessionID')->index();;  // Alternatively, you can use this as the foreign key
+            $table->uuid('session_id')->index(); // Alternatively, you can use this as the foreign key
             $table->string('subject');
             $table->string('course');
             $table->string('level_of_education');
