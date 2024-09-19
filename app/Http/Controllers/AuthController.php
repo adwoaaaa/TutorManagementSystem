@@ -83,7 +83,15 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return response()->json(['token' => $token]);
+    // Getting the user from JWT token
+        $user = JWTAuth::user();
+
+    // Checking if the user role is student
+        if ($user->role !== 'student') {
+            return response()->json(['error' => 'Unauthorized! Only students can login here'], 401);
+        }
+
+       return $this->respondWithToken($token);
     }
 
     protected function respondWithToken($token)
@@ -95,5 +103,17 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => $ttl * 60, // Convert minutes to seconds
         ]);
+    }
+
+
+    public function logout(Request $request)
+    {
+        try {
+        JWTAuth::invalidate(JWTAuth::parseToken());
+        return response()->json(['message' => 'Successfully logged out'], 200);
+        
+      } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to logout'], 500);
+      }
     }
 }

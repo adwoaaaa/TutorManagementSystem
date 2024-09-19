@@ -40,15 +40,28 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+    
 
-        'guards' => [
             'api' => [
                 'driver' => 'jwt',
                 'provider' => 'users',
+                'hash' => false,
             ],
+
+    
+            'student' => [
+                'driver' => 'jwt',
+                'provider' => 'users',
+            ],
+
+
+            'administrator' => [
+                'driver' => 'jwt',
+                'provider' => 'users',
+            ],
+
         ],
 
-    ],
 
     /*
     |--------------------------------------------------------------------------

@@ -18,6 +18,8 @@ class SessionRequestForm extends Model
         'venue', 
         'additional_information', 
         'duration', 
+        'repetition_period',
+        'session_status',
         'date', 
         'time', 
         'student'

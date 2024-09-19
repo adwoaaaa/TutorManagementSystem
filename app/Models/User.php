@@ -90,11 +90,12 @@ class User extends Authenticatable implements JWTSubject
        return $this->hasMany(SessionRequestForm::class, 'student');
    }
 
-
+/*
    public function sessions()
    {
        return $this->hasMany(Session::class, 'student_id');
    }
+   */
 
 
    public function payments()

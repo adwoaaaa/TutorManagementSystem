@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('venue');
             $table->text('additional_information')->nullable();
             $table->string('duration');
+            $table->integer('repetition_period')->nullable(); // Period for repetition
+            $table->string('session_status')->default('pending'); // Status of the session
             $table->date('date');
             $table->time('time');
             $table->uuid('student');  // Foreign key to users table

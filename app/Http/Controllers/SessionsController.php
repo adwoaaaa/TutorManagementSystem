@@ -5,16 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Sessions;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api'); // Ensure all methods require authentication
+        $this->middleware('administrator')->only(['store']); // Admins can access this method
+    }
+ 
     public function index()
     {
-        $sessions = Session::all();
+        $sessions = Sessions::all();
 
         if ($sessions->isEmpty()) {
             return response()->json([
-                'message' => 'No sessions available'
+                'message' => 'No sessions available.'
             ], 200);
         }
 
@@ -23,31 +30,26 @@ class SessionsController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'repetition_status' => 'required|string|max:255',
-            'repetition_period' => 'nullable|integer',
-            'session_status' => 'required|string|max:255',
-            'session_request_form_id' => 'required|uuid|exists:session_request_forms,session_id',
-            'student_id' => 'required|uuid|exists:users,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors()
-            ], 400);
-        } else {
-            $session = Session::create($request->all());
-
-            return response()->json([
-                'message' => 'Session created successfully',
-                'data' => $session
-            ], 201);
-        }
+        return response()->json(['message' => 'Not allowed. Sessions are created automatically upon approval of session requests.'], 403);
     }
+
+    public function show($id)
+    {
+        $session = Sessions::find($id);
+
+        if (!$session) {
+            return response()->json([
+                'message' => 'Session not found'
+            ], 404);
+        }
+
+        return response()->json($session, 200);
+    }
+
 
     public function update(Request $request, $id)
     {
-        $session = Session::find($id);
+        $session = Sessions::find($id);
 
         if (!$session) {
             return response()->json([
@@ -56,9 +58,6 @@ class SessionsController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'repetition_status' => 'required|string|max:255',
-            'repetition_period' => 'nullable|integer',
-            'session_status' => 'required|string|max:255',
             'session_request_form_id' => 'required|uuid|exists:session_request_forms,session_id',
             'student_id' => 'required|uuid|exists:users,id',
         ]);
@@ -71,14 +70,14 @@ class SessionsController extends Controller
             $session->update($request->all());
 
             return response()->json([
-                'message' => 'Updated Successfully',
+                'message' => 'Updated Successfully.',
                 'data' => $session
             ], 200);
         }
     }
         public function destroy($id)
     {
-        $session = Session::find($id);
+        $session = Sessions::find($id);
 
         if (!$session) {
             return response()->json([
@@ -89,7 +88,7 @@ class SessionsController extends Controller
         $session->delete();
 
         return response()->json([
-            'message' => 'Session successfully deleted'
+            'message' => 'Session successfully deleted.'
         ], 200);
     }
 }

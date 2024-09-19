@@ -18,11 +18,17 @@ use App\Http\Controllers\SessionsController;
 */
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
 Route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
 
 
-Route::apiResource('session-requests', SessionRequestFormController::class);
-Route::post('session-requests/{id}/approve', [SessionRequestFormController::class, 'approve']);
-Route::apiResource('sessions', SessionsController::class);
+Route::group(['middleware' => ['auth:api', 'student']], function () {
+    Route::apiResource('session-requests', SessionRequestFormController::class);
+});
+
+
+Route::group(['middleware' => ['auth:api', 'administrator']], function () {
+    Route::post('session-requests/{id}/approve', [SessionRequestFormController::class, 'approve']);
+    Route::apiResource('sessions', SessionsController::class);
+});
