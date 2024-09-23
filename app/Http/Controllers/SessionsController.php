@@ -58,8 +58,8 @@ class SessionsController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'session_request_form_id' => 'required|uuid|exists:session_request_forms,session_id',
-            'student_id' => 'required|uuid|exists:users,id',
+            'session_request_form_id' => 'required|integer|exists:session_request_forms,session_id',
+            'student' => 'required|uuid|exists:users,id',
         ]);
 
         if ($validator->fails()) {

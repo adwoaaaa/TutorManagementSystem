@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('sessions', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID as primary key
-            $table->uuid('session_request_form_id'); // Foreign key to session_request_forms table
+            $table->unsignedBigInteger('session_request_form_id'); // Foreign key to session_request_forms table
+            $table->string('session_status');
             $table->timestamps();
 
             // Foreign key constraints
          //   $table->foreign('student_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('session_request_form_id')->references('session_id')->on('session_request_forms')->onDelete('cascade');
+            $table->foreign('session_request_form_id')->references('id')->on('session_request_forms')->onDelete('cascade');
         });
     }
 

@@ -87,9 +87,10 @@ class AuthController extends Controller
         $user = JWTAuth::user();
 
     // Checking if the user role is student
-        if ($user->role !== 'student') {
+       /* if ($user->role !== 'student') {
             return response()->json(['error' => 'Unauthorized! Only students can login here'], 401);
         }
+        */
 
        return $this->respondWithToken($token);
     }

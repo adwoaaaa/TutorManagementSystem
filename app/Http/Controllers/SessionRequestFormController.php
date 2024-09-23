@@ -46,8 +46,8 @@ class SessionRequestFormController extends Controller
             'venue' => 'required|string|max:255',
             'additional_information' => 'nullable|string',
             'duration' => 'required|string',
-            'repetition_period' => 'nullable'|'integer',
-            'session_status' => 'required'|'string'|'max:255',
+            'repetition_period' => 'nullable|integer',
+           // 'session_status' => 'required|string|max:255',
             'date' => 'required|date',
             'time' => 'required|date_format:H:i',
             'student' => 'required|uuid|exists:users,id',  // Foreign key check
@@ -59,7 +59,7 @@ class SessionRequestFormController extends Controller
             ], 400);
 
         } else {
-            $sessionRequest = SessionRequestForm::create($request->all());
+            $sessionRequest = SessionRequestForm::create(array_merge($request->all(), ['session_status' => 'pending',]));
 
             return response()->json([
                 'message' => 'Session request created successfully',
@@ -101,8 +101,8 @@ class SessionRequestFormController extends Controller
             'venue' => 'required|string|max:255',
             'additional_information' => 'nullable|string',
             'duration' => 'required|string',
-            'repetition_period' => 'nullable'|'integer',
-            'session_status' => 'required'|'string'|'max:255',
+            'repetition_period' => 'nullable|integer',
+        //  'session_status' => 'required|string|max:255',
             'date' => 'required|date',
             'time' => 'required|date_format:H:i',
             'student' => 'required|uuid|exists:users,id',
@@ -160,12 +160,13 @@ class SessionRequestFormController extends Controller
     // Creating a session upon approval
     if ($sessionRequestForm->session_status === 'approved') {
 
-        Sessions::create([
+       $session = Sessions::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
             'session_status' => 'approved',
             'session_request_form_id' => $sessionRequestForm->id,
         ]);
 
-        return response()->json(['message' => 'Session request form approved and session created successfully.'], 201);
+        return response()->json(['message' => 'Session request form approved and session created successfully.', 'session' => $session], 201);
     }   
         return response()->json(['message' => 'Session request form rejected.'], 200);
    }
