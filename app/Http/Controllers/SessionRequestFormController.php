@@ -15,15 +15,31 @@ class SessionRequestFormController extends Controller
     public function __construct()
     {
         // Applying middleware for appropriate roles
-        $this->middleware('auth:api')->except(['index', 'show']);
+        $this->middleware('auth:api')->except(['show']);
         $this->middleware('student')->only([ 'store', 'update', 'destroy']);
-        $this->middleware('administrator')->only('approve');
+        $this->middleware('administrator')->only(['index', 'approve']);
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
-       $sessionRequests = SessionRequestForm::all();
+       
+        $status = $request->input('status');
+        $search = $request->input('search');
+
+        $query = SessionRequestForm::query();
+
+        if ($status){
+            $query->where('session_status', $status);
+        }
+
+        if ($search){
+            $query->whereHas('student', function($bring) use ($search) {
+                $bring->where('lastName', 'like', '%' . $search . '%')->orWhere('otherNames', 'like', '%' . $search . '%');
+            });
+        }
+
+       $sessionRequests = $query->get();
 
        if ($sessionRequests->isEmpty()){
         return response()->json([
@@ -34,6 +50,8 @@ class SessionRequestFormController extends Controller
      return response()->json($sessionRequests, 200);
 
    }
+
+
 
     public function store(Request $request)
     {

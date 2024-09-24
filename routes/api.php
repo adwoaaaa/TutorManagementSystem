@@ -24,11 +24,12 @@ Route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
 
 
 Route::group(['middleware' => ['auth:api', 'student']], function () {
-    Route::apiResource('session-requests', SessionRequestFormController::class);
+    Route::apiResource('session-requests', SessionRequestFormController::class)->except(['index', 'approve']);
 });
 
 
 Route::group(['middleware' => ['auth:api', 'administrator']], function () {
+    Route::get('session-requests', [SessionRequestFormController::class, 'index']);
     Route::post('session-requests/{id}/approve', [SessionRequestFormController::class, 'approve']);
 });
 
