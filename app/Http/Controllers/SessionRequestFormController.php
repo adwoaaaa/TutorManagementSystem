@@ -17,7 +17,7 @@ class SessionRequestFormController extends Controller
         // Applying middleware for appropriate roles
         $this->middleware('auth:api')->except(['show']);
         $this->middleware('student')->only([ 'store', 'update', 'destroy']);
-        $this->middleware('administrator')->only(['index', 'approve']);
+        $this->middleware('administrator')->only(['index', 'approve', 'reject']);
     }
 
 
@@ -161,31 +161,55 @@ class SessionRequestFormController extends Controller
 
     public function approve(Request $request, $id)
     {
-
-    // Finding the session request form by its id
-    $sessionRequestForm = SessionRequestForm::findOrFail($id);
-
-    // Performing validation to either accept or reject
-    $validatedData = $request->validate([
-        'session_status' => 'required|in:approved,rejected',
+        // Finding the session request form by its id
+        $sessionRequestForm = SessionRequestForm::findOrFail($id);
     
-    ]);
+        // Check if the session request form is already approved
+        if ($sessionRequestForm->session_status === 'approved') {
+            return response()->json(['message' => 'Session request form is already approved.'], 200);
+        }
+    
+        // Update the session request form status to approved
+        $sessionRequestForm->session_status = 'approved';
+        $sessionRequestForm->save();
+    
+        // Check if a session already exists for this request
+        $existingSession = Sessions::where('session_request_form_id', $sessionRequestForm->id)->first();
+    
+        if (!$existingSession) {
+            // Creating a session upon approval
+            $session = Sessions::create([
+                'id' => (string) \Illuminate\Support\Str::uuid(),
+                'session_status' => 'approved',
+                'session_request_form_id' => $sessionRequestForm->id,
+            ]);
+    
+            return response()->json(['message' => 'Session request form approved and session created successfully.', 'session' => $session], 201);
+        } else {
+            return response()->json(['message' => 'Session request form approved, but a session already exists.'], 200);
+        }
+    }
 
-    // Update the session request form status
-    $sessionRequestForm->session_status = $validatedData['session_status'];
-    $sessionRequestForm->save();
 
-    // Creating a session upon approval
-    if ($sessionRequestForm->session_status === 'approved') {
+    public function reject(Request $request, $id)
+   {
+    // Find the session request by ID
+    $sessionRequest = SessionRequestForm::findOrFail($id);
+    
+    // Find the session associated with this request using the correct foreign key
+    $session = Sessions::where('session_request_form_id', $sessionRequest->id)->first();
 
-       $session = Sessions::create([
-            'id' => (string) \Illuminate\Support\Str::uuid(),
-            'session_status' => 'approved',
-            'session_request_form_id' => $sessionRequestForm->id,
-        ]);
+    // Reject the session request
+    $sessionRequest->session_status = 'rejected';
+    $sessionRequest->save();
 
-        return response()->json(['message' => 'Session request form approved and session created successfully.', 'session' => $session], 201);
-    }   
-        return response()->json(['message' => 'Session request form rejected.'], 200);
-   }
+    // Delete the session if it exists
+    if ($session) {
+        $session->delete();
+    }
+
+    return response()->json([
+        'message' => 'Session request rejected and associated session deleted.'
+    ], 200);
+    }
 }

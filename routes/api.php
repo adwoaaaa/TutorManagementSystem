@@ -31,6 +31,7 @@ Route::group(['middleware' => ['auth:api', 'student']], function () {
 Route::group(['middleware' => ['auth:api', 'administrator']], function () {
     Route::get('session-requests', [SessionRequestFormController::class, 'index']);
     Route::post('session-requests/{id}/approve', [SessionRequestFormController::class, 'approve']);
+    Route::post('session-requests/{id}/reject', [SessionRequestFormController::class, 'reject']);
 });
 
 
