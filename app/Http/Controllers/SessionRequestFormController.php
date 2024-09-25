@@ -183,6 +183,10 @@ class SessionRequestFormController extends Controller
                 'session_status' => 'approved',
                 'session_request_form_id' => $sessionRequestForm->id,
             ]);
+        
+        // Eager loading student info
+            $session = Sessions::with('sessionRequestForm.student')->find($session->id);
+
     
             return response()->json(['message' => 'Session request form approved and session created successfully.', 'session' => $session], 201);
         } else {
