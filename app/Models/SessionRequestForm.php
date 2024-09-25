@@ -14,7 +14,7 @@ class SessionRequestForm extends Model
         'subject', 
         'course', 
         'level_of_education', 
-        'session_period', 
+       // 'session_period',
         'venue', 
         'additional_information', 
         'duration', 
