@@ -23,7 +23,7 @@ class Payments extends Model
 
     public function session(): BelongsTo
     {
-        return $this->belongsTo(Session::class, 'session_id');
+        return $this->belongsTo(Sessions::class, 'session_id');
     }
 
     
