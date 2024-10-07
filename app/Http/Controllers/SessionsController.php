@@ -12,7 +12,7 @@ class SessionsController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api'); // Ensure all methods require authentication
-        $this->middleware('administrator')->only(['store']); // Admins can access this method
+       // $this->middleware('administrator')->only(['store']); // Admins can access this method
     }
  
     public function index()

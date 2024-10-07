@@ -24,7 +24,8 @@ Route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
 
 
 Route::group(['middleware' => ['auth:api', 'student']], function () {
-    Route::apiResource('session-requests', SessionRequestFormController::class)->except(['index', 'approve']);
+    Route::get('session-requests/student', [SessionRequestFormController::class, 'index']);
+    Route::apiResource('session-requests', SessionRequestFormController::class)->except(['approve', 'reject']);
 });
 
 

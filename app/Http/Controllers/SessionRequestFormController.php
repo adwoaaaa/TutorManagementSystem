@@ -15,9 +15,9 @@ class SessionRequestFormController extends Controller
     public function __construct()
     {
         // Applying middleware for appropriate roles
-        $this->middleware('auth:api')->except(['show']);
+        $this->middleware('auth:api');//->except(['show']);
         $this->middleware('student')->only([ 'store', 'update', 'destroy']);
-        $this->middleware('administrator')->only(['index', 'approve', 'reject']);
+        $this->middleware('administrator')->only(['approve', 'reject']);
     }
 
 
@@ -29,11 +29,15 @@ class SessionRequestFormController extends Controller
 
         $query = SessionRequestForm::query();
 
+        if (Auth::user()->role === 'student') {
+            $query->where('student', Auth::id());
+        }
+
         if ($status){
             $query->where('session_status', $status);
         }
 
-        if ($search){
+        if ($search  && Auth::user()->role === 'administrator'){
             $query->whereHas('student', function($bring) use ($search) {
                 $bring->where('lastName', 'like', '%' . $search . '%')->orWhere('otherNames', 'like', '%' . $search . '%');
             });
