@@ -70,7 +70,7 @@ class SessionRequestFormController extends Controller
             'duration' => 'required|string',
             'repetition_period' => 'nullable|integer',
            // 'session_status' => 'required|string|max:255',
-            'date' => 'required|date',
+            'day' => 'required|string',
             'time' => 'required|date_format:H:i',
             'student' => 'required|uuid|exists:users,id',  // Foreign key check
         ]);
@@ -125,7 +125,7 @@ class SessionRequestFormController extends Controller
             'duration' => 'required|string',
             'repetition_period' => 'nullable|integer',
         //  'session_status' => 'required|string|max:255',
-            'date' => 'required|date',
+            'day' => 'required|string',
             'time' => 'required|date_format:H:i',
             'student' => 'required|uuid|exists:users,id',
         ]);

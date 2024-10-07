@@ -20,7 +20,7 @@ class SessionRequestForm extends Model
         'duration', 
         'repetition_period',
         'session_status',
-        'date', 
+        'day', 
         'time', 
         'student'
     ];
