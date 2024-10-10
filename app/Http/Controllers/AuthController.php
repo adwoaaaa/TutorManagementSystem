@@ -86,12 +86,30 @@ class AuthController extends Controller
     // Getting the user from JWT token
         $user = JWTAuth::user();
 
-    // Checking if the user role is student
-       /* if ($user->role !== 'student') {
-            return response()->json(['error' => 'Unauthorized! Only students can login here'], 401);
-        }
-        */
+    // Checking if the users' role 
+        if ($user->role === 'student') {
 
+            return response()->json([
+                'message' => 'Student login successful',
+                'user' => $user,
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => config('jwt.ttl') * 60, ], 200);
+        }elseif ($user->role === 'administrator'){
+
+            return response()->json([
+                'message' => 'Administrator login successful',
+                'user' => $user,
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => config('jwt.ttl') * 60,   
+            ], 200);
+        }else {
+            return response()->json(['error' => 'Unauthorized.', 401]);
+        }
+    }
+        
+/*
        return $this->respondWithToken($token);
     }
 
@@ -105,6 +123,7 @@ class AuthController extends Controller
             'expires_in' => $ttl * 60, // Convert minutes to seconds
         ]);
     }
+        */
 
 
     public function logout(Request $request)
