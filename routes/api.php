@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SessionRequestFormController;
 use App\Http\Controllers\SessionsController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,3 +38,13 @@ Route::group(['middleware' => ['auth:api', 'administrator']], function () {
 
 
  Route::apiResource('sessions', SessionsController::class)->middleware('auth:api');
+
+ Route::apiResource('reports', ReportController::class)->middleware('auth:api');
+
+ /*
+ Route::middleware('auth:api')->group(function () {
+    Route::post('/reports', [ReportController::class, 'store']); // Create a report
+    Route::get('/reports', [ReportController::class, 'index']);  // Get all reports
+    Route::get('/reports/{id}', [ReportController::class, 'show']); // Get a specific report
+});
+*/
