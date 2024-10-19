@@ -39,7 +39,11 @@ Route::group(['middleware' => ['auth:api', 'administrator']], function () {
 
  Route::apiResource('sessions', SessionsController::class)->middleware('auth:api');
 
- Route::apiResource('reports', ReportController::class)->middleware('auth:api');
+ Route::post('reports', [ReportController::class, 'store']);
+
+ Route::middleware('auth:api')->group(function () {
+    Route::apiResource('reports', ReportController::class)->only(['index', 'show']);
+ });
 
  /*
  Route::middleware('auth:api')->group(function () {
