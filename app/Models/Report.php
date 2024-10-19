@@ -12,11 +12,14 @@ class Report extends Model
 
     protected $fillable = [
         'student',
+        'name',          // Name for public submissions
+        'email',         // Email for public submissions
+        'phoneNumber',   // Phone number for public submissions
         'message',
     ];
 
     public function student(): Belongsto
     {
-       return $this->belongsTo(User::class, 'student');
+       return $this->belongsTo(User::class, 'student', 'id');
     }
 }

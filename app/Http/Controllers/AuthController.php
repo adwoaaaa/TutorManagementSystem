@@ -83,10 +83,10 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-    // Getting the user from JWT token
+        // Getting the user from JWT token
         $user = JWTAuth::user();
 
-    // Checking if the users' role 
+        // Checking if the users' role
         if ($user->role === 'student') {
 
             return response()->json([
@@ -94,22 +94,23 @@ class AuthController extends Controller
                 'user' => $user,
                 'access_token' => $token,
                 'token_type' => 'bearer',
-                'expires_in' => config('jwt.ttl') * 60, ], 200);
-        }elseif ($user->role === 'administrator'){
+                'expires_in' => config('jwt.ttl') * 60,
+            ], 200);
+        } elseif ($user->role === 'administrator') {
 
             return response()->json([
                 'message' => 'Administrator login successful',
                 'user' => $user,
                 'access_token' => $token,
                 'token_type' => 'bearer',
-                'expires_in' => config('jwt.ttl') * 60,   
+                'expires_in' => config('jwt.ttl') * 60,
             ], 200);
-        }else {
+        } else {
             return response()->json(['error' => 'Unauthorized.', 401]);
         }
     }
-        
-/*
+
+    /*
        return $this->respondWithToken($token);
     }
 
@@ -125,15 +126,75 @@ class AuthController extends Controller
     }
         */
 
+    public function update(Request $request)
+    {
+        // Validate the request input
+        $validator = Validator::make($request->all(), [
+            'lastName' => 'sometimes|string|max:255',
+            'otherNames' => 'sometimes|string|max:255',
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . auth()->user()->id,
+            'phoneNumber' => 'sometimes|string|max:20',
+            'password' => 'sometimes|string|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Get the authenticated user
+        $user = JWTAuth::user();
+
+        // Update the user details
+        $user->lastName = $request->get('lastName', $user->lastName);
+        $user->otherNames = $request->get('otherNames', $user->otherNames);
+        $user->email = $request->get('email', $user->email);
+        $user->phoneNumber = $request->get('phoneNumber', $user->phoneNumber);
+        if ($request->has('password')) {
+            $user->password = Hash::make($request->password);
+        }
+        $user->save();
+
+        return response()->json([
+            'message' => 'User details updated successfully',
+            'user' => $user
+        ], 200);
+    }
+
+    public function deleteStudent($id)
+    {
+        // Get the authenticated user (admin)
+        $admin = JWTAuth::user();
+
+        // Check if the user is an administrator
+        if ($admin->role !== 'administrator') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        // Find the student by ID
+        $student = User::where('id', $id)->where('role', 'student')->first();
+
+        // If student does not exist
+        if (!$student) {
+            return response()->json(['error' => 'Student not found'], 404);
+        }
+
+        // Delete the student account
+        $student->delete();
+
+        return response()->json([
+            'message' => 'Student account deleted successfully'
+        ], 200);
+    }
+
+
 
     public function logout(Request $request)
     {
         try {
-        JWTAuth::invalidate(JWTAuth::parseToken());
-        return response()->json(['message' => 'Successfully logged out'], 200);
-        
-      } catch (\Exception $e) {
-        return response()->json(['error' => 'Failed to logout'], 500);
-      }
+            JWTAuth::invalidate(JWTAuth::parseToken());
+            return response()->json(['message' => 'Successfully logged out'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to logout'], 500);
+        }
     }
 }

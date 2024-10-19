@@ -10,13 +10,14 @@ class ReportController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api'); // Ensure all methods require authentication
+        $this->middleware('auth:api')->except(['store']); // Ensure all methods require authentication
     }
 
     //Create a new report
     public function store(Request $request)
     {
-        // ensuring only students can create reports
+        if (Auth::check()) {
+        // ensuring only students can create reports when authenticated
         if (Auth::user()->role !== 'student') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -33,8 +34,29 @@ class ReportController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Report created successfully.',
+            'message' => 'Report submitted successfully.',
         'data' => $report], 201);
+    }else{ 
+         // For general public, validate name, email, and message
+         $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phoneNumber' => 'required|string|max:15',
+            'message' => 'required|string',
+        ]);
+
+        $report = Report::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phoneNumber' => $request->phoneNumber,
+            'message' => $request->message,
+        ]);
+
+        return response()->json([
+            'message' => 'Your report has been submitted successfully.',
+            'data' => $report,
+        ], 201);
+    }
     }
 
     public function index()
@@ -46,8 +68,30 @@ class ReportController extends Controller
         if ($reports->isEmpty()) {
             return response()->json(['message' => 'No reports available in the system'], 404);
         }
+            // Prepare a response that differentiates between student and public reports
+        $reportData = $reports->map(function ($report) {
+            if ($report->student) {
+                return [
+                    'id' => $report->id,
+                    'message' => $report->message,
+                    'student' => [
+                        'id' => $report->student->id,
+                        'email' => $report->student->email,
+                        'phoneNumber' => $report->student->phoneNumber,
+                    ],
+                ];
+            } else {
+                return [
+                    'id' => $report->id,
+                    'message' => $report->message,
+                    'name' => $report->name,
+                    'email' => $report->email,
+                    'phoneNumber' => $report->phoneNumber,
+                ];
+            }
+        });
 
-             return response()->json($reports);
+        return response()->json($reportData);
         }
         
       // Allowing students to view only their personal reports
@@ -75,10 +119,8 @@ class ReportController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        if (!$report) {
-            return response()->json([
-                'message' => 'Report not found'
-            ], 404);
+        if (Auth::user()->role === 'administrator') {
+            return response()->json($report);
         }
 
         return response()->json($report);
