@@ -25,6 +25,13 @@ class SessionRequestForm extends Model
         'student'
     ];
 
+
+    // Cast dthe fields day and time as arrays
+    protected $casts = [
+        'day' => 'array',  
+        'time' => 'array',  
+    ];
+
     
     public function student(): BelongsTo
     {

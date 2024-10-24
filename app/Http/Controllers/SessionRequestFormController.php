@@ -70,9 +70,10 @@ class SessionRequestFormController extends Controller
             'duration' => 'required|string',
             'repetition_period' => 'nullable|integer',
            // 'session_status' => 'required|string|max:255',
-            'day' => 'required|string',
-            'time' => 'required|date_format:H:i',
-            'student' => 'required|uuid|exists:users,id',  // Foreign key check
+           'day' => 'required|array',
+           'time' => 'required|array',
+           'time.*' => 'date_format:H:i',
+           // 'student' => 'required|uuid|exists:users,id',  // Foreign key check
         ]);
 
         if ($validator->fails()) {
@@ -80,15 +81,21 @@ class SessionRequestFormController extends Controller
                 'errors' => $validator->errors()
             ], 400);
 
-        } else {
-            $sessionRequest = SessionRequestForm::create(array_merge($request->all(), ['session_status' => 'pending',]));
+        } 
+
+        $data = array_merge($request->all(), [
+            'session_status' => 'pending',
+            'student' => Auth::id() // Automatically assign student ID
+        ]);
+    
+            $sessionRequest = SessionRequestForm::create($data);
 
             return response()->json([
                 'message' => 'Session request created successfully',
                 'data' => $sessionRequest
             ], 201);
-        }
     }
+
 
     public function show($id)
     {
@@ -98,6 +105,10 @@ class SessionRequestFormController extends Controller
             return response()->json([
                 'message' => 'Session request not found'
             ], 404);
+        }
+
+        if (Auth::user()->role === 'student' && $sessionRequest->student !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized access to this session request.'], 403);
         }
 
         return response()->json($sessionRequest, 200); 
@@ -125,9 +136,10 @@ class SessionRequestFormController extends Controller
             'duration' => 'required|string',
             'repetition_period' => 'nullable|integer',
         //  'session_status' => 'required|string|max:255',
-            'day' => 'required|string',
-            'time' => 'required|date_format:H:i',
-            'student' => 'required|uuid|exists:users,id',
+            'day' => 'required|array',
+            'time' => 'required|array',
+            'time.*' => 'date_format:H:i',
+           // 'student' => 'required|uuid|exists:users,id',
         ]);
 
         if ($validator->fails()) {

@@ -126,6 +126,16 @@ class AuthController extends Controller
     }
         */
 
+     public function getAllStudents(Request $request)
+    {
+        // Fetch all students from the database
+        $students = User::where('role', 'student')->get(); 
+    
+        return response()->json($students);
+    }
+
+
+    
     public function update(Request $request)
     {
         // Validate the request input
