@@ -42,16 +42,10 @@ Route::group(['middleware' => ['auth:api', 'administrator']], function () {
 
  Route::apiResource('sessions', SessionsController::class)->middleware('auth:api');
 
- Route::post('reports', [ReportController::class, 'store']);
+ Route::post('/reports', [ReportController::class, 'store']);
 
+ 
  Route::middleware('auth:api')->group(function () {
-    Route::apiResource('reports', ReportController::class)->only(['index', 'show']);
- });
-
- /*
- Route::middleware('auth:api')->group(function () {
-    Route::post('/reports', [ReportController::class, 'store']); // Create a report
-    Route::get('/reports', [ReportController::class, 'index']);  // Get all reports
-    Route::get('/reports/{id}', [ReportController::class, 'show']); // Get a specific report
+    Route::get('/reports', [ReportController::class, 'index']);  
+    Route::get('/reports/{id}', [ReportController::class, 'show']); 
 });
-*/

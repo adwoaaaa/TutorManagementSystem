@@ -11,15 +11,15 @@ class Report extends Model
     use HasFactory;
 
     protected $fillable = [
-        'student',
-        'name',          // Name for public submissions
+        //'student',
+       // 'name',          // Name for public submissions
         'email',         // Email for public submissions
-        'phoneNumber',   // Phone number for public submissions
+       // 'phoneNumber',   // Phone number for public submissions
         'message',
     ];
 
-    public function student(): Belongsto
+ /*   public function student(): Belongsto
     {
        return $this->belongsTo(User::class, 'student', 'id');
-    }
+    }*/
 }
