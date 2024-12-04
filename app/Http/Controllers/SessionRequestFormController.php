@@ -27,7 +27,9 @@ class SessionRequestFormController extends Controller
         $status = $request->input('status');
         $search = $request->input('search');
 
-        $query = SessionRequestForm::query();
+        $query = SessionRequestForm::with(['student' => function ($query){
+            $query->select('id', 'lastName', 'otherNames');
+        }]);
 
         if (Auth::user()->role === 'student') {
             $query->where('student', Auth::id());
@@ -127,17 +129,17 @@ class SessionRequestFormController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'subject' => 'required|string|max:255',
-            'course' => 'required|string|max:255',
-            'level_of_education' => 'required|string|max:255',
+            'subject' => 'sometimes|string|max:255',
+            'course' => 'sometimes|string|max:255',
+            'level_of_education' => 'sometimes|string|max:255',
         //    'session_period' => 'required|string|max:255',
-            'venue' => 'required|string|max:255',
+            'venue' => 'sometimes|string|max:255',
             'additional_information' => 'nullable|string',
-            'duration' => 'required|integer',
+            'duration' => 'sometimes|integer',
             'repetition_period' => 'nullable|integer',
         //  'session_status' => 'required|string|max:255',
-            'day' => 'required|array',
-            'time' => 'required|array',
+            'day' => 'sometimes|array',
+            'time' => 'sometimes|array',
             'time.*' => 'date_format:H:i',
            // 'student' => 'required|uuid|exists:users,id',
         ]);

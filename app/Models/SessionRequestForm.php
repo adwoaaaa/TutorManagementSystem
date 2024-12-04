@@ -35,6 +35,6 @@ class SessionRequestForm extends Model
     
     public function student(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'student');
+        return $this->belongsTo(User::class, 'student')->select('id', 'lastName', 'otherNames');
     }
 }
